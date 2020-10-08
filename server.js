@@ -8,7 +8,7 @@ app.get("/api", (req, res, next) => {
 	res.send("TESTING API");
 });
 
-const port = 8080;
+const port = process.env.PORT || 8080;
 app.listen(port, () => {
 	console.log("Running on port 8080");
 });
