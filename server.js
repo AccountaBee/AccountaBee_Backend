@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 
 app.get("/", (req, res, next) => {
-	res.send("TESTING GET");
+	res.send("TESTING GET ROUTE");
 });
 app.get("/api", (req, res, next) => {
 	res.send("TESTING API");
