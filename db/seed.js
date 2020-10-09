@@ -49,6 +49,12 @@ async function seed() {
 		})
 	]);
 
+	await users[0].addFriend(users[1]);
+	await users[1].addFriend(users[0]);
+	let friends1 = await users[1].getFriends();
+	console.log("is is not emptty??", friends1); //return an empty array
+	let friends0 = await users[0].getFriends();
+	// console.log(friends0); //returns an array of friends
 	console.log("seeded users");
 }
 
