@@ -5,7 +5,7 @@ app.get("/", (req, res, next) => {
 	res.send("TESTING GET ROUTE");
 });
 app.get("/api", (req, res, next) => {
-	res.send("TESTING API");
+	res.json({ testKey: "testValue" });
 });
 
 const port = process.env.PORT || 8080;
