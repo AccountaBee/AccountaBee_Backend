@@ -1,9 +1,11 @@
 const express = require("express");
 const db = require("./db/db");
 const app = express();
+const { User } = require("./db/models");
 
 app.get("/", async (req, res, next) => {
-	res.send("TESTING GET ROUTE");
+	let users = await User.findAll();
+	res.json(users);
 });
 app.get("/api", (req, res, next) => {
 	res.json({ testKey: "testValue" });
