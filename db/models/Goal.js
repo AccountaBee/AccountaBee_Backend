@@ -7,10 +7,12 @@ const Goal = db.define("goal", {
 		allowNull: false
 	},
 	requiredDays: {
-		type: Sequelize.INTEGER
+		type: Sequelize.INTEGER,
+		allowNull: false;
 	},
 	completedDays: {
-		type: Sequelize.INTEGER
+		type: Sequelize.INTEGER,
+		defaultValue: 0
 	}
 });
 

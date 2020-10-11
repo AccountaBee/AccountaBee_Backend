@@ -7,54 +7,45 @@ async function seed() {
 	const users = await Promise.all([
 		User.create({
 			firstName: "Jenny",
-			lastName: "Thomas",
 			email: "JThomas@email.com",
 			password: "12567"
 		}),
 		User.create({
 			firstName: "Ben",
-			lastName: "Murphy",
 			email: "Bmurphy@email.com",
 			password: "wishesRus"
 		}),
 		User.create({
 			firstName: "Lacy",
-			lastName: "Mitchell",
 			email: "Lacy0090@email.com",
 			password: "helloWorld"
 		}),
 		User.create({
 			firstName: "Carry",
-			lastName: "Benson",
 			email: "CarryLim@email.com",
 			password: "TimeLess12294"
 		}),
 		User.create({
 			firstName: "Connie",
-			lastName: "Gordan",
 			email: "CGordan@email.com",
 			password: "crAshing567"
 		}),
 		User.create({
 			firstName: "Edward",
-			lastName: "Gonzalez",
 			email: "EGisCool@email.com",
 			password: "Ell9090"
 		}),
 		User.create({
 			firstName: "Sam",
-			lastName: "chan",
 			email: "ChanchanisHere@email.com",
 			password: "8979goodBye"
 		})
 	]);
 
+	// right now, this is our solution to make the friendship go both ways. a better solution probably exists
 	await users[0].addFriend(users[1]);
 	await users[1].addFriend(users[0]);
-	let friends1 = await users[1].getFriends();
-	console.log("is is not emptty??", friends1); //return an empty array
-	let friends0 = await users[0].getFriends();
-	// console.log(friends0); //returns an array of friends
+
 	console.log("seeded users");
 }
 
