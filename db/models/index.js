@@ -17,5 +17,4 @@ Goal.belongsTo(User);
 User.hasMany(Post);
 Post.belongsTo(User);
 
-//add more models when we make them
-module.exports = { User, Goal };
+module.exports = { User, Goal, Post };
