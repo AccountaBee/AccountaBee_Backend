@@ -28,84 +28,92 @@ router.get("/", async (req, res, next) => {
 
 // I'm matching key names to the current front end, but we can always change them later to match the database field names to keep things more clear/dry. Or we can change the database field names!
 
-router.put("/:id", async (req, res, next) => {
-	try {
-		let goal = await Goal.findByPk(req.params.id);
-		if (!goal) {
-			const err = new Error("Sorry, that goal could not be found");
-			return res.status(404).send(err.message);
-		}
-		let updateBody = {};
-		if (req.query.complete === "true") {
-			// should we let the user add more days than required? I think so. In which case, let's just double check to make sure we don't accidentally add more than 7 days. We should have front-end logic to make that button unavailable.
-			if (goal.completedDays === 7) {
-				const err = new Error("There are only 7 days in a week, can't add more!");
-				// no idea what status codes to use.....
-				return res.status(500).send(err.message);
-			}
-			updateBody = { completedDays: goal.completedDays + 1 };
-		} else if (req.body) {
-			updateBody = { title: req.body.goal, requiredDays: req.body.frequency };
-		} else {
-			// if we don't have a query param or a req.body, something went wrong on our end
-			const err = new Error("Internal Server Error");
-			return res.status(500).send(err.message);
-		}
+// router.put("/:id", async (req, res, next) => {
+// 	try {
+// 		let goal = await Goal.findByPk(req.params.id);
+// 		if (!goal) {
+// 			const err = new Error("Sorry, that goal could not be found");
+// 			return res.status(404).send(err.message);
+// 		}
+// 		let updateBody = {};
+// 		if (req.query.complete === "true") {
+// 			// should we let the user add more days than required? I think so. In which case, let's just double check to make sure we don't accidentally add more than 7 days. We should have front-end logic to make that button unavailable.
+// 			if (goal.completedDays === 7) {
+// 				const err = new Error("There are only 7 days in a week, can't add more!");
+// 				// no idea what status codes to use.....
+// 				return res.status(500).send(err.message);
+// 			}
+// 			updateBody = { completedDays: goal.completedDays + 1 };
+// 		} else if (req.body) {
+// 			updateBody = { title: req.body.goal, requiredDays: req.body.frequency };
+// 		} else {
+// 			// if we don't have a query param or a req.body, something went wrong on our end
+// 			const err = new Error("Internal Server Error");
+// 			return res.status(500).send(err.message);
+// 		}
 
-		goal = await goal.update(updateBody);
+// 		goal = await goal.update(updateBody);
 
-		res.json(goal);
-	} catch (error) {
-		next(error);
-	}
-});
+// 		res.json(goal);
+// 	} catch (error) {
+// 		next(error);
+// 	}
+// });
 
-// POST: create new goal on signup. we can redo this to take in all 1-3 goals at once if that's easier on the front end, for now it adds one goal at a time.
+// POST: create new goals on signup
+// Expects req.body to be a nested object structured like { goal1: { title: "title", requiredDays: 4 }, goal2: { title: "title", requiredDays: 3} }
 router.post("/signup", async (req, res, next) => {
 	try {
 		// get current user
-		let user = await User.findByPk(req.user.id, { include: Goal });
-		let newGoal = await Goal.create({ title: req.body.goal, requiredDays: req.body.frequency });
+		let user = await User.findByPk(req.user.id);
+		console.log(req.body);
+		const goals = req.body;
+		const goalsArr = [];
+		for (let goal in goals) {
+			let title = goals[goal].title;
+			let requiredDays = goals[goal].requiredDays;
+			let newGoal = await Goal.create({ title, requiredDays });
+			goalsArr.push(newGoal);
+		}
+		// // associate goals with user
+		await user.addGoals(goalsArr);
 
-		// associate goal with user
-		await user.addGoal(newGoal);
-		// not sure why but when you send out the goal it says the userId is null? weird because it defintely adds it in the database
-		res.json(newGoal);
+		res.json(goalsArr);
 	} catch (error) {
 		next(error);
 	}
 });
 
 // POST: create new goals if user logs in after a week has passed (will check if week has passed on front end before entering this route)
-router.post("/weekly", async (req, res, next) => {
-	try {
-		// get current user
-		let user = await User.findByPk(req.user.id, { include: Goal });
-		// get current goals
-		let goals = await user.getGoals();
-		//get active goals only
-		activeGoals = goals.filter(goal => goal.active);
+// router.post("/weekly", async (req, res, next) => {
+// 	try {
+// 		// get current user
+// 		let user = await User.findByPk(req.user.id, { include: Goal });
+// 		// get current goals
+// 		let goals = await user.getGoals();
+// 		//get active goals only
+// 		activeGoals = goals.filter(goal => goal.active);
 
-		let newGoals = [];
+// 		let newGoals = [];
 
-		// update all active goals to inactive, and create new goals with the same information
-		for (let i = 0; i < activeGoals.length; i++) {
-			let currentGoal = activeGoals[i];
-			await currentGoal.update({ active: false });
+// 		// update all active goals to inactive, and create new goals with the same information
+// 		for (let i = 0; i < activeGoals.length; i++) {
+// 			let currentGoal = activeGoals[i];
+// 			await currentGoal.update({ active: false });
 
-			let newGoal = await Goal.create({
-				title: currentGoal.title,
-				requiredDays: currentGoal.requiredDays
-			});
-			newGoals.push(newGoal);
-		}
+// 			let newGoal = await Goal.create({
+// 				title: currentGoal.title,
+// 				requiredDays: currentGoal.requiredDays
+// 			});
+// 			newGoals.push(newGoal);
+// 		}
 
-		await user.addGoals(newGoals);
+// 		await user.addGoals(newGoals);
 
-		res.json(newGoals);
-	} catch (error) {
-		next(error);
-	}
-});
+// 		res.json(newGoals);
+// 	} catch (error) {
+// 		next(error);
+// 	}
+// });
 
 module.exports = router;
