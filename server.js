@@ -1,7 +1,6 @@
 const express = require("express");
 const db = require("./db/db");
 const app = express();
-const { User } = require("./db/models");
 const session = require("express-session");
 const passport = require("passport");
 const SequelizeStore = require("connect-session-sequelize")(session.Store);

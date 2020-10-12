@@ -42,7 +42,7 @@ async function seed() {
 		})
 	]);
 
-	// right now, this is our solution to make the friendship go both ways. a better solution probably exists
+	// right now, this is our solution when adding friends to make the friendship go both ways. Not sure if it's better to have double the amount of fields in te database, or to make querying more complicated later on.
 	await users[0].addFriend(users[1]);
 	await users[1].addFriend(users[0]);
 
