@@ -15,6 +15,10 @@ const Goal = db.define("goal", {
 	completedDays: {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
+	},
+	active: {
+		type: Sequelize.BOOLEAN,
+		defaultValue: true
 	}
 });
 
