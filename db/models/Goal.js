@@ -16,9 +16,9 @@ const Goal = db.define("goal", {
 		type: Sequelize.INTEGER,
 		defaultValue: 0
 	},
-	active: {
-		type: Sequelize.BOOLEAN,
-		defaultValue: true
+	status: {
+		type: Sequelize.ENUM("active", "inactive", "deleted"),
+		defaultValue: "active"
 	}
 });
 
