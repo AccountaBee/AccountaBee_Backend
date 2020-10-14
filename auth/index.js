@@ -39,6 +39,7 @@ router.post("/logout", (req, res) => {
 });
 
 router.get("/me", (req, res) => {
+	console.log(req.sessionID);
 	res.json(req.user);
 });
 
