@@ -2,8 +2,10 @@ const router = require("express").Router();
 const { Goal, User } = require("../db/models");
 const admin = require("firebase-admin");
 
+const serviceAccount = require(process.env.GCP_KEY_FILE);
+
 admin.initializeApp({
-	credential: admin.credential.applicationDefault(),
+	credential: admin.credential.cert(serviceAccount),
 	databaseURL: process.env.FIREBASE_DATABASE_URL
 });
 
