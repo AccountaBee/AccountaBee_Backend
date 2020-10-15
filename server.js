@@ -1,6 +1,7 @@
 const express = require("express");
 const db = require("./db/db");
 const app = express();
+
 // const session = require("express-session");
 // const passport = require("passport");
 // const SequelizeStore = require("connect-session-sequelize")(session.Store);
@@ -37,7 +38,7 @@ app.use(express.urlencoded({ extended: true }));
 // app.use(passport.initialize());
 // app.use(passport.session());
 
-app.use("/auth", require("./auth"));
+// app.use("/auth", require("./auth"));
 app.use("/api", require("./api"));
 
 app.use((err, req, res, next) => {
