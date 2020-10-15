@@ -2,6 +2,11 @@ const router = require("express").Router();
 const { Goal, User } = require("../db/models");
 const admin = require("firebase-admin");
 
+admin.initializeApp({
+	credential: admin.credential.applicationDefault(),
+	databaseURL: process.env.FIREBASE_DATABASE_URL
+});
+
 // signup route, expecting token, firstName, and email in req.body
 router.post("/signup", async (req, res, next) => {
 	const { token, firstName, email } = req.body;
