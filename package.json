@@ -7,7 +7,8 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"start": "node server.js",
 		"start-dev": "nodemon server.js",
-		"seed": "node db/seed.js"
+		"seed": "node db/seed.js",
+		"preinstall": "node gcpSetup.js"
 	},
 	"repository": {
 		"type": "git",
@@ -24,6 +25,8 @@
 		"connect-session-sequelize": "^7.0.3",
 		"express": "^4.17.1",
 		"express-session": "^1.17.1",
+		"firebase-admin": "^9.2.0",
+		"fs": "0.0.1-security",
 		"passport": "^0.4.1",
 		"passport-google-oauth": "^2.0.0",
 		"pg": "^8.4.1",
