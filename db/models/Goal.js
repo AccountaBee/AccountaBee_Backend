@@ -1,3 +1,4 @@
+const { INTEGER } = require("sequelize");
 const Sequelize = require("sequelize");
 const db = require("../db");
 
@@ -19,6 +20,10 @@ const Goal = db.define("goal", {
 	status: {
 		type: Sequelize.ENUM("active", "inactive", "deleted"),
 		defaultValue: "active"
+	},
+	goalId: {
+		type: INTEGER,
+		allowNull: false
 	}
 });
 

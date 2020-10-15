@@ -1,32 +1,39 @@
 const router = require("express").Router();
 const { Goal, User } = require("../db/models");
+const admin = require("firebase-admin");
 
-// signup route, expecting firebase user id and firstName in req.body
+// signup route, expecting token, firstName, and email in req.body
 router.post("/signup", async (req, res, next) => {
-	const { uid, firstName, email, password } = req.body;
+	const { token, firstName, email } = req.body;
+	const decodedToken = admin.auth().verifyIdToken(token);
+	const uid = decodedToken.uid;
 	const [user] = await User.findOrCreate({
 		where: {
 			uid,
 			firstName,
-			email,
-			password
+			email
 		}
 	});
 	console.log(user);
 	res.json(user);
 });
 
+// expecting token in req.body
+
 router.post("/login", async (req, res, next) => {
 	try {
-		const { uid, email, password } = req.body;
-		const user = await User.findByPk(uid, { include: Goal });
-		if (!user.correctPassword(password)) {
-			console.log("Incorrect password for user:", email);
-			res.status(401).send("Wrong username and/or password");
-		} else {
-			console.log(user);
-			res.json(user);
-		}
+		const { token } = req.body;
+		const decodedToken = admin.auth().verifyIdToken(token);
+		const uid = decodedToken.uid;
+		const user = await User.findOne({
+			where: {
+				uid
+			},
+			include: {
+				model: Goal
+			}
+		});
+		res.json(user);
 	} catch (error) {
 		next(error);
 	}
