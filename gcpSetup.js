@@ -1,2 +1,2 @@
 const fs = require("fs");
-fs.writeFile(process.env.GCP_KEY_FILE, process.env.GCP_CRED, err => {});
+fs.writeFile("./google-credentials-heroku.json", process.env.GCP_CRED, err => {});
