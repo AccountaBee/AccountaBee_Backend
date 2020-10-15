@@ -101,10 +101,10 @@ router.put("/:id", async (req, res, next) => {
 // });
 
 // POST: create up to 3 new goals
-// Expects req.body to be a nested object in format { goals: [{title, frequency, goalId}, {title, frequency}, {title, frequency}], token }
+// Expects req.body to be a nested object in format { goals: [{title, frequency}, {title, frequency}, {title, frequency}], token }
 router.post("/", async (req, res, next) => {
 	try {
-		const { goals, goalId, token } = req.body;
+		const { goals, token } = req.body;
 
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
@@ -115,24 +115,30 @@ router.post("/", async (req, res, next) => {
 		});
 
 		const updatedGoals = [];
+		const titles = [];
 
 		for (let i = 0; i < goals.length; i++) {
 			let currentGoal = goals[i];
 			let [updatedGoal] = Goal.findOrCreate({
 				where: {
 					uid,
-					goalId
+					title: currentGoal.title
 				}
 			});
-
-			await updatedGoal.update({ title: currentGoal.title, frequency: currentGoal.frequency });
+			titles.push(currentGoal.title);
+			await updatedGoal.update({ frequency: currentGoal.frequency });
 
 			updatedGoals.push(updatedGoal);
 		}
 
+		let oldGoals = updatedGoals.filter(goal => !titles.includes(goal.title));
+		for (let i = 0; i < oldGoals.length; i++) {
+			await oldGoals[i].update({ status: "inactive" });
+		}
+		let newGoals = updatedGoals.filter(goal => titles.includes(goal.title));
 		// // associate goals with user
-		await user.addGoals(updatedGoals);
-		res.json(updatedGoals);
+		await user.addGoals(newGoals);
+		res.json(newGoals);
 	} catch (error) {
 		next(error);
 	}
