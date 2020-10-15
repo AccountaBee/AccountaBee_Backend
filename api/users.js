@@ -24,7 +24,9 @@ router.post("/login", async (req, res, next) => {
 	try {
 		const { token } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
+		console.log("DECODED TOKEN", decodedToken);
 		const uid = decodedToken.uid;
+		console.log("UID", uid);
 		const user = await User.findOne({
 			where: {
 				uid
