@@ -5,7 +5,7 @@ const admin = require("firebase-admin");
 // signup route, expecting token, firstName, and email in req.body
 router.post("/signup", async (req, res, next) => {
 	const { token, firstName, email } = req.body;
-	const decodedToken = admin.auth().verifyIdToken(token);
+	const decodedToken = await admin.auth().verifyIdToken(token);
 	const uid = decodedToken.uid;
 	const [user] = await User.findOrCreate({
 		where: {
@@ -23,7 +23,7 @@ router.post("/signup", async (req, res, next) => {
 router.post("/login", async (req, res, next) => {
 	try {
 		const { token } = req.body;
-		const decodedToken = admin.auth().verifyIdToken(token);
+		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
 		const user = await User.findOne({
 			where: {

@@ -7,7 +7,7 @@ const { Goal, User } = require("../db/models");
 router.get("/", async (req, res, next) => {
 	try {
 		const { token } = req.body;
-		const decodedToken = admin.auth().verifyIdToken(token);
+		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
 		let user = await User.findOne({
 			where: {
@@ -105,9 +105,8 @@ router.put("/:id", async (req, res, next) => {
 router.post("/", async (req, res, next) => {
 	try {
 		const { goals, goalId, token } = req.body;
-		// do I need awaits here??
 
-		const decodedToken = admin.auth().verifyIdToken(token);
+		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
 		let user = await User.findOne({
 			where: {
