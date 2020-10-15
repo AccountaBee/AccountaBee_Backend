@@ -7,7 +7,6 @@ const { Goal, User } = require("../db/models");
 // expecting req.body to contain uid of current user
 router.get("/", async (req, res, next) => {
 	try {
-
 		const { token } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
@@ -17,8 +16,6 @@ router.get("/", async (req, res, next) => {
 			},
 			include: {
 				model: Goals
-
-		
 			}
 		});
 		if (!user) {
@@ -68,9 +65,7 @@ router.put("/reset", async (req, res, next) => {
 			await goals[i].update({ completedDays: 0 });
 		}
 
-
 		res.json(goals);
-
 	} catch (error) {
 		next(error);
 	}
@@ -92,7 +87,6 @@ router.put("/:id", async (req, res, next) => {
 		next(error);
 	}
 });
-
 
 // // DELETE a goal by id (mark as deleted)
 // router.delete("/:id", async (req, res, next) => {
@@ -166,6 +160,5 @@ router.post("/", async (req, res, next) => {
 // 	user.addGoal(goal);
 // 	res.json(goal);
 // });
-
 
 module.exports = router;
