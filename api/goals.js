@@ -126,7 +126,7 @@ router.post("/", async (req, res, next) => {
 			let currentGoal = goals[i];
 			let [updatedGoal] = await Goal.findOrCreate({
 				where: {
-					uid,
+					userUid: uid,
 					title: currentGoal.title
 				}
 			});
