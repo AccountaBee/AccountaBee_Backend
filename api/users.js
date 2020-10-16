@@ -1,16 +1,9 @@
-const router = require("express").Router();
-const { Goal, User } = require("../db/models");
-const admin = require("firebase-admin");
-
-const serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
-
-admin.initializeApp({
-	credential: admin.credential.cert(serviceAccount),
-	databaseURL: process.env.FIREBASE_DATABASE_URL
-});
+const router = require('express').Router();
+const { Goal, User } = require('../db/models');
+const admin = require('../server');
 
 // signup route, expecting token, firstName, and email in req.body
-router.post("/signup", async (req, res, next) => {
+router.post('/signup', async (req, res, next) => {
 	const { token, firstName, email } = req.body;
 	const decodedToken = await admin.auth().verifyIdToken(token);
 	const uid = decodedToken.uid;
@@ -18,8 +11,8 @@ router.post("/signup", async (req, res, next) => {
 		where: {
 			uid,
 			firstName,
-			email
-		}
+			email,
+		},
 	});
 	console.log(user);
 	res.json(user);
@@ -27,20 +20,20 @@ router.post("/signup", async (req, res, next) => {
 
 // expecting token in req.body
 
-router.post("/login", async (req, res, next) => {
+router.post('/login', async (req, res, next) => {
 	try {
 		const { token } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
-		console.log("DECODED TOKEN", decodedToken);
+		console.log('DECODED TOKEN', decodedToken);
 		const uid = decodedToken.uid;
-		console.log("UID", uid);
+		console.log('UID', uid);
 		const user = await User.findOne({
 			where: {
-				uid
+				uid,
 			},
 			include: {
-				model: Goal
-			}
+				model: Goal,
+			},
 		});
 		res.json(user);
 	} catch (error) {

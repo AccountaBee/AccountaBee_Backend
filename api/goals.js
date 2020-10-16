@@ -1,13 +1,6 @@
 const router = require('express').Router();
 const { Goal, User } = require('../db/models');
-const admin = require('firebase-admin');
-
-const serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
-
-admin.initializeApp({
-	credential: admin.credential.cert(serviceAccount),
-	databaseURL: process.env.FIREBASE_DATABASE_URL,
-});
+const admin = require('../server');
 
 // TO-DO: security middleware - will need to check if the current uid we pass to req.body matches the uid of user or the userId of a goal
 
@@ -23,7 +16,7 @@ router.get('/', async (req, res, next) => {
 				uid,
 			},
 			include: {
-				model: Goals,
+				model: Goal,
 			},
 		});
 		if (!user) {
