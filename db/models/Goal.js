@@ -9,9 +9,8 @@ const Goal = db.define("goal", {
 		type: Sequelize.STRING,
 		allowNull: false
 	},
-	requiredDays: {
-		type: Sequelize.INTEGER,
-		allowNull: false
+	frequency: {
+		type: Sequelize.INTEGER
 	},
 	completedDays: {
 		type: Sequelize.INTEGER,
@@ -20,10 +19,6 @@ const Goal = db.define("goal", {
 	status: {
 		type: Sequelize.ENUM("active", "inactive", "deleted"),
 		defaultValue: "active"
-	},
-	goalId: {
-		type: INTEGER,
-		allowNull: false
 	}
 });
 
