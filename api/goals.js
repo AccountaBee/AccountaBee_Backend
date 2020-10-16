@@ -108,15 +108,17 @@ router.put('/:id', async (req, res, next) => {
 router.post('/', async (req, res, next) => {
 	try {
 		const { goals, token } = req.body;
-
+		console.log('These are the goals -------> ', goals);
+		console.log('This is the token -------> ', token);
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
+		console.log('This is the decoded uid -------> ', uid);
 		let user = await User.findOne({
 			where: {
 				uid,
 			},
 		});
-
+		console.log('This is the user -------> ', user);
 		const updatedGoals = [];
 		const titles = [];
 
@@ -133,12 +135,13 @@ router.post('/', async (req, res, next) => {
 
 			updatedGoals.push(updatedGoal);
 		}
-
-		let oldGoals = updatedGoals.filter((goal) => !titles.includes(goal.title));
-		for (let i = 0; i < oldGoals.length; i++) {
-			await oldGoals[i].update({ status: 'inactive' });
-		}
+		console.log('These are the updated goals -------> ', updatedGoals);
+		// let oldGoals = updatedGoals.filter((goal) => !titles.includes(goal.title));
+		// for (let i = 0; i < oldGoals.length; i++) {
+		// 	await oldGoals[i].update({ status: 'inactive' });
+		// }
 		let newGoals = updatedGoals.filter((goal) => titles.includes(goal.title));
+		console.log('These are the new goals -------> ', newGoals);
 		// // associate goals with user
 		await user.addGoals(newGoals);
 		res.json(newGoals);
