@@ -4,18 +4,24 @@ const admin = require('../server');
 
 // signup route, expecting token, firstName, and email in req.body
 router.post('/signup', async (req, res, next) => {
-	const { token, firstName, email } = req.body;
-	const decodedToken = await admin.auth().verifyIdToken(token);
-	const uid = decodedToken.uid;
-	const [user] = await User.findOrCreate({
-		where: {
-			uid,
-			firstName,
-			email,
-		},
-	});
-	console.log(user);
-	res.json(user);
+	try {
+		const { token, firstName, email } = req.body;
+		console.log('req.body: ', req.body);
+		const decodedToken = await admin.auth().verifyIdToken(token);
+		const uid = decodedToken.uid;
+		console.log('decoded token: ', uid);
+		const [user] = await User.findOrCreate({
+			where: {
+				uid,
+				firstName,
+				email,
+			},
+		});
+		console.log('user after creation: ', user);
+		res.json(user);
+	} catch (error) {
+		console.log('error!! ', error);
+	}
 });
 
 // expecting token in req.body
