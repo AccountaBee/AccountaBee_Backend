@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { Goal, User } = require('../db/models');
-const admin = require('../server');
+const admin = require('../firebase.config');
 
 // signup route, expecting token, firstName, and email in req.body
 router.post('/signup', async (req, res, next) => {

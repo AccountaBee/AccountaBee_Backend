@@ -2,15 +2,6 @@ const express = require('express');
 const db = require('./db/db');
 const app = express();
 
-const admin = require('firebase-admin');
-
-const serviceAccount = require(process.env.GOOGLE_APPLICATION_CREDENTIALS);
-
-admin.initializeApp({
-	credential: admin.credential.cert(serviceAccount),
-	databaseURL: process.env.FIREBASE_DATABASE_URL,
-});
-
 // const session = require("express-session");
 // const passport = require("passport");
 // const SequelizeStore = require("connect-session-sequelize")(session.Store);
@@ -62,5 +53,3 @@ app.listen(port, () => {
 });
 
 db.sync();
-
-module.exports = admin;
