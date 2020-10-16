@@ -131,7 +131,7 @@ router.post("/", async (req, res, next) => {
 				}
 			});
 			titles.push(currentGoal.title);
-			await updatedGoal.update({ frequency: currentGoal.frequency });
+			await updatedGoal.update({ requiredDays: currentGoal.frequency });
 
 			updatedGoals.push(updatedGoal);
 		}
