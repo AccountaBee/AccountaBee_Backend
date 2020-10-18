@@ -1,7 +1,7 @@
 const Sequelize = require("sequelize");
-const db = require("./db");
+const db = require("../db");
 
-const Friend = db.define("friendship", {
+const Friendship = db.define("friendship", {
 	status: {
 		type: Sequelize.ENUM("requested", "confirmed", "denied"),
 		allowNull: false,
@@ -9,4 +9,4 @@ const Friend = db.define("friendship", {
 	}
 });
 
-module.exports = Friend;
+module.exports = Friendship;

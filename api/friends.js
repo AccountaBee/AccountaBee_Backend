@@ -1,28 +1,35 @@
 const router = require("express").Router();
 const { User, Friendship } = require("../db/models/index");
 const { Op } = require("sequelize");
+const admin = require("../firebase.config");
 
-module.exports = router;
-
-// TO-DO - change all uid to tokens, change names of table to be more clear
-
-// get all confirmed friends
+// GET all of the user's friends (all friends who's status is "confirmed")
+// expecting token in req.body
 router.get("/", async (req, res, next) => {
 	try {
-		const { uid } = req.body;
+		const { token } = req.body;
+		const decodedToken = await admin.auth().verifyIdToken(token);
+		const uid = decodedToken.uid;
+		console.log("uid", uid);
+
+		// find all confirmed friendships related to the current user, can be either senderId or receiverId
 		const friendships = await Friendship.findAll({
 			where: {
-				[Op.or]: [{ userId: uid }, { friendId: uid }],
+				[Op.or]: [{ senderId: uid }, { receiverId: uid }],
 				status: "confirmed"
 			}
 		});
+		console.log(friendships);
+
 		const friends = [];
-		// push users who are NOT the current user into friends
+		// push all users from friendships who are NOT the current user into friends array so that we can send back info about each friend
 		for (let i = 0; i < friendships.length; i++) {
-			let current = friendships[i];
+			let currentFriendship = friendships[i];
 			let friendId;
-			if (current.userId === uid) friendId = current.friendId;
-			else friendId = current.userId;
+			// set the friendId to whichever id is opposite to the current user's id
+			if (currentFriendship.senderId === uid) friendId = currentFriendship.receiverId;
+			else friendId = currentFriendship.senderId;
+			// find friend in the database
 			let friend = await User.findOne({
 				where: {
 					uid: friendId
@@ -30,17 +37,23 @@ router.get("/", async (req, res, next) => {
 			});
 			friends.push(friend);
 		}
+		console.log("friends", friends);
 		res.json(friends);
 	} catch (error) {
 		next(error);
 	}
 });
 
-// SEND friend request - create new relationship with status "requested", current user being uid1
-// expecting token and friend email in req.body
+// POST: send friend request. Create new row in Friendship with status "requested", current user id is set to senderId and friend's id is set to receiverId
+// expecting current user token and friend's email in req.body
 router.post("/request", async (req, res, next) => {
 	try {
-		const { uid, email } = req.body;
+		console.log(req.body);
+		const { token, email } = req.body;
+		const decodedToken = await admin.auth().verifyIdToken(token);
+		const uid = decodedToken.uid;
+		console.log("uid", uid);
+
 		const friend = await User.findOne({
 			where: {
 				email
@@ -52,74 +65,42 @@ router.post("/request", async (req, res, next) => {
 				uid
 			}
 		});
-		console.log(user, friend);
 
 		if (!friend || !user) {
 			return res.status(404).send("Sorry, that user does not have an account");
 		}
+		console.log("user", user);
+		console.log("friend", friend);
+
+		// creates row with user id as senderId and friend's id as receiverId
 		await user.addFriend(friend);
+		console.log("added friend");
 		res.send(`Your friend request to ${friend.firstName} is sent!`);
 	} catch (error) {
 		next(error);
 	}
 });
 
-// route to view all requests sent to you, expecting token and friend uid
-router.get("/invites", async (req, res, next) => {
-	// findAll where my uid is friendId
-	const { uid, senderId } = req.body;
-	const invites = await Friendship.findAll({
-		where: {
-			userId: senderId,
-			friendId: uid,
-			status: "requested"
-		}
-	});
-
-	// loop through each request to get email and firstName to display to user
-	const inviteObjs = [];
-	for (let i = 0; i < invites.length; i++) {
-		let friend = await User.findOne({
-			where: {
-				uid: senderId
-			},
-			attributes: ["firstName", "email", "uid"]
-		});
-		inviteObjs.push(friend);
-	}
-	res.json(inviteObjs);
-});
-
-// route to confirm friendship - takes in user token and requester's id and status (either confirmed or denied)
-router.put("/reply", async (req, res, next) => {
-	try {
-		// change status to confirmed or denied
-		const { uid, senderId, status } = req.body;
-		const friendship = await Friendship.findOne({
-			where: {
-				userId: senderId,
-				friendId: uid
-			}
-		});
-		await friendship.update({ status });
-		res.send(`You are now friends!`);
-	} catch (error) {
-		next(error);
-	}
-});
-
-// route to get all requests you've sent, takes in token
+// GET /sent - route to get all requests you've sent, takes in token
 router.get("/sent", async (req, res, next) => {
 	try {
-		const { uid } = req.body;
+		const { token } = req.body;
+		const decodedToken = await admin.auth().verifyIdToken(token);
+		const uid = decodedToken.uid;
+		console.log("uid", uid);
+
 		const user = await User.findOne({
 			where: {
 				uid
 			}
 		});
-		// can only use magic methods on SENDER
+		console.log("user", user);
 
+		// can only use magic methods on SENDER
 		const friendships = await user.getFriends();
+		console.log("friendships", friendships);
+
+		// filter so we only have friendships with requested status
 		const unconfirmed = friendships.filter(
 			friendship => friendship.friendship.status === "requested"
 		);
@@ -128,3 +109,65 @@ router.get("/sent", async (req, res, next) => {
 		next(error);
 	}
 });
+
+// GET /invites - get all friend requests sent to you. expecting token of current user
+router.get("/invites", async (req, res, next) => {
+	try {
+		const { token } = req.body;
+		const decodedToken = await admin.auth().verifyIdToken(token);
+		const uid = decodedToken.uid;
+		console.log("uid", uid);
+
+		// find all friendships where user is the reciever and status is "requested"
+		const requests = await Friendship.findAll({
+			where: {
+				receiverId: uid,
+				status: "requested"
+			}
+		});
+		console.log("requests", requests);
+
+		// loop through each friendship so we have access to email and firstName of friend to display to user
+		const requestedFriends = [];
+		for (let i = 0; i < requests.length; i++) {
+			let friend = await User.findOne({
+				where: {
+					uid: requests[i].senderId
+				}
+			});
+			requestedFriends.push(friend);
+		}
+		res.json(requestedFriends);
+	} catch (error) {
+		next(error);
+	}
+});
+
+// PUT /reply - route to confirm or deny friendship. takes in current user token, sender's id, and status (either confirmed or denied) in req.body
+router.put("/reply", async (req, res, next) => {
+	try {
+		console.log(req.body);
+		const { token, senderId, status } = req.body;
+		const decodedToken = await admin.auth().verifyIdToken(token);
+		const uid = decodedToken.uid;
+		console.log("uid", uid);
+
+		const friendship = await Friendship.findOne({
+			where: {
+				senderId,
+				receiverId: uid
+			}
+		});
+		console.log(friendship);
+		await friendship.update({ status });
+		if (status === "confirmed") return res.send(`You are now friends!`);
+		else if (status === "denied") return res.send("Successfully deleted friend request");
+		else {
+			return res.status(500).send("Sorry, there was an error");
+		}
+	} catch (error) {
+		next(error);
+	}
+});
+
+module.exports = router;
