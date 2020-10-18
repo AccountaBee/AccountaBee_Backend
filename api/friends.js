@@ -5,9 +5,9 @@ const admin = require("../firebase.config");
 
 // GET all of the user's friends (all friends who's status is "confirmed")
 // expecting token in req.body
-router.get("/:token", async (req, res, next) => {
+router.post("/", async (req, res, next) => {
 	try {
-		const token = req.params.token;
+		const { token } = req.body;
 		console.log("token", token);
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
@@ -83,9 +83,9 @@ router.post("/request", async (req, res, next) => {
 });
 
 // GET /sent - route to get all requests you've sent, takes in token
-router.get("/sent", async (req, res, next) => {
+router.post("/sent", async (req, res, next) => {
 	try {
-		const token = req.params.token;
+		const { token } = req.body;
 		console.log("token", token);
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
@@ -113,9 +113,9 @@ router.get("/sent", async (req, res, next) => {
 });
 
 // GET /invites - get all friend requests sent to you. expecting token of current user
-router.get("/invites", async (req, res, next) => {
+router.post("/invites", async (req, res, next) => {
 	try {
-		const token = req.params.token;
+		const { token } = req.body;
 		console.log("token", token);
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
