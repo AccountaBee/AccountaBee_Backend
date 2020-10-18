@@ -91,18 +91,18 @@ router.put("/:id", async (req, res, next) => {
 });
 
 // // DELETE a goal by id (mark as deleted)
-// router.delete("/:id", async (req, res, next) => {
-// 	try {
-// 		let goal = await Goal.findByPk(req.params.id);
-// 		if (!goal) {
-// 			return res.status(404).send("Goal Does Not Exist");
-// 		}
-// 		goal = await goal.update({ status: "deleted" });
-// 		res.json(goal);
-// 	} catch (error) {
-// 		next(error);
-// 	}
-// });
+router.delete("/:id", async (req, res, next) => {
+	try {
+		let goal = await Goal.findByPk(req.params.id);
+		if (!goal) {
+			return res.status(404).send("Goal Does Not Exist");
+		}
+		goal = await goal.update({ status: "inactive" });
+		res.json(goal);
+	} catch (error) {
+		next(error);
+	}
+});
 
 // POST: create up to 3 new goals
 // Expects req.body to be a nested object in format { goals: [{title, frequency}, {title, frequency}, {title, frequency}], token }
