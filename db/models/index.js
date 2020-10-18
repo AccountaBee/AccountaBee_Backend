@@ -1,14 +1,16 @@
 const User = require("./User");
 const Goal = require("./Goal");
 const Post = require("./Post");
+const Friendship = require("./Friendship");
 
-//create associations here
+// associations
 
+// senderId == user who sent the request, receiverId = user who receives request
 User.belongsToMany(User, {
 	as: "friends",
-	through: "friendship",
-	foreignKey: "userId",
-	otherKey: "friendId"
+	through: Friendship,
+	foreignKey: "senderId",
+	otherKey: "receiverId"
 });
 
 User.hasMany(Goal);
@@ -17,4 +19,4 @@ Goal.belongsTo(User);
 User.hasMany(Post);
 Post.belongsTo(User);
 
-module.exports = { User, Goal, Post };
+module.exports = { User, Goal, Post, Friendship };

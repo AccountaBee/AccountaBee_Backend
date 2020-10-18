@@ -2,13 +2,11 @@ const router = require("express").Router();
 const { Goal, User } = require("../db/models");
 const admin = require("../firebase.config");
 
-// TO-DO: security middleware - will need to check if the current uid we pass to req.body matches the uid of user or the userId of a goal
-
 // GET all of a user's goals (for user's dashboard)
-// expecting req.body to contain uid of current user
+// expecting req.body to contain token of current user
 router.post("/activeGoals", async (req, res, next) => {
 	try {
-    console.log('IN ACTIVE GOALS ROUTE REQ.BODY:', req.body)
+		console.log("IN ACTIVE GOALS ROUTE REQ.BODY:", req.body);
 		const { token } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
@@ -19,8 +17,8 @@ router.post("/activeGoals", async (req, res, next) => {
 			include: {
 				model: Goal
 			}
-    });
-    console.log('IN GET ROUTE USER:', user)
+		});
+		console.log("IN GET ROUTE USER:", user);
 
 		if (!user) {
 			const err = new Error("User does not exist");
@@ -32,7 +30,7 @@ router.post("/activeGoals", async (req, res, next) => {
 			// if (req.query.active === "inactive") goals = goals.filter(goal => goal.status === "inactive");
 			// else if (req.query.active === "active")
 			// 	goals = goals.filter(goal => goal.status === "active");
-      console.log('IN GET ROUTE, GOAL:', goals)
+			console.log("IN GET ROUTE, GOAL:", goals);
 			res.json(goals);
 		}
 	} catch (error) {
@@ -139,9 +137,9 @@ router.post("/", async (req, res, next) => {
 			updatedGoals.push(updatedGoal);
 		}
 		console.log("These are the updated goals -------> ", updatedGoals);
-		// let oldGoals = updatedGoals.filter((goal) => !titles.includes(goal.title));
+		// let oldGoals = updatedGoals.filter(goal => !titles.includes(goal.title));
 		// for (let i = 0; i < oldGoals.length; i++) {
-		// 	await oldGoals[i].update({ status: 'inactive' });
+		// 	await oldGoals[i].update({ status: "inactive" });
 		// }
 		let newGoals = updatedGoals.filter(goal => titles.includes(goal.title));
 		console.log("These are the new goals -------> ", newGoals);
@@ -152,20 +150,5 @@ router.post("/", async (req, res, next) => {
 		next(error);
 	}
 });
-
-// Add a single new goal. expecting req.body to be in format { title: "title", requiredDays: 6, uid: firebaseId}
-// User should not see an option to add new goal unless they have less than 3 active goals, but we have error handling just in case
-
-// router.post("/", async (req, res, next) => {
-// 	const goal = await Goal.create(req.body);
-// 	const user = await User.findByPk(req.user.id, { include: Goal });
-// 	let activeGoals = user.goals.filter(goal => goal.status === "active");
-// 	if (activeGoals.length >= 3) {
-// 		return res.status(500).send("Can only have 3 current goals");
-// 	}
-
-// 	user.addGoal(goal);
-// 	res.json(goal);
-// });
 
 module.exports = router;
