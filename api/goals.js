@@ -8,6 +8,7 @@ const admin = require("../firebase.config");
 // expecting req.body to contain uid of current user
 router.get("/", async (req, res, next) => {
 	try {
+    console.log('IN GET ROUTE REQ.BODY:', req.body)
 		const { token } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
@@ -18,7 +19,9 @@ router.get("/", async (req, res, next) => {
 			include: {
 				model: Goal
 			}
-		});
+    });
+    console.log('IN GET ROUTE USER:', user)
+
 		if (!user) {
 			const err = new Error("User does not exist");
 			return res.status(401).send(err.message);
@@ -29,7 +32,7 @@ router.get("/", async (req, res, next) => {
 			// if (req.query.active === "inactive") goals = goals.filter(goal => goal.status === "inactive");
 			// else if (req.query.active === "active")
 			// 	goals = goals.filter(goal => goal.status === "active");
-
+      console.log('IN GET ROUTE, GOAL:', goals)
 			res.json(goals);
 		}
 	} catch (error) {
@@ -89,19 +92,19 @@ router.put("/:id", async (req, res, next) => {
 	}
 });
 
-// DELETE a goal by id (mark as deleted)
-router.delete("/:id", async (req, res, next) => {
-	try {
-		let goal = await Goal.findByPk(req.params.id);
-		if (!goal) {
-			return res.status(404).send("Goal Does Not Exist");
-		}
-		goal = await goal.update({ status: "inactive" });
-		res.json(goal);
-	} catch (error) {
-		next(error);
-	}
-});
+// // DELETE a goal by id (mark as deleted)
+// router.delete("/:id", async (req, res, next) => {
+// 	try {
+// 		let goal = await Goal.findByPk(req.params.id);
+// 		if (!goal) {
+// 			return res.status(404).send("Goal Does Not Exist");
+// 		}
+// 		goal = await goal.update({ status: "deleted" });
+// 		res.json(goal);
+// 	} catch (error) {
+// 		next(error);
+// 	}
+// });
 
 // POST: create up to 3 new goals
 // Expects req.body to be a nested object in format { goals: [{title, frequency}, {title, frequency}, {title, frequency}], token }
