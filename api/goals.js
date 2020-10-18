@@ -6,7 +6,7 @@ const admin = require("../firebase.config");
 
 // GET all of a user's goals (for user's dashboard)
 // expecting req.body to contain uid of current user
-router.get("/", async (req, res, next) => {
+router.post("/", async (req, res, next) => {
 	try {
     console.log('IN GET ROUTE REQ.BODY:', req.body)
 		const { token } = req.body;
