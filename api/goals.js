@@ -90,14 +90,28 @@ router.put("/:id", async (req, res, next) => {
 	}
 });
 
-// // DELETE a goal by id (mark as deleted)
-router.delete("/:id", async (req, res, next) => {
+// // DELETE a goal by id (mark as inactive)
+router.delete("/inactivate/:id", async (req, res, next) => {
 	try {
 		let goal = await Goal.findByPk(req.params.id);
 		if (!goal) {
 			return res.status(404).send("Goal Does Not Exist");
 		}
 		goal = await goal.update({ status: "inactive" });
+		res.json(goal);
+	} catch (error) {
+		next(error);
+	}
+});
+
+// // DELETE a goal by id (mark as deleted)
+router.delete("/delete/:id", async (req, res, next) => {
+	try {
+		let goal = await Goal.findByPk(req.params.id);
+		if (!goal) {
+			return res.status(404).send("Goal Does Not Exist");
+		}
+		goal = await goal.update({ status: "deleted" });
 		res.json(goal);
 	} catch (error) {
 		next(error);
