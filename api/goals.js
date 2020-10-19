@@ -90,7 +90,7 @@ router.put("/:id", async (req, res, next) => {
 	}
 });
 
-// // DELETE a goal by id (mark as deleted)
+// // DELETE a goal by id (mark as inactive)
 router.delete("/inactivate/:id", async (req, res, next) => {
 	try {
 		let goal = await Goal.findByPk(req.params.id);
