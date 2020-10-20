@@ -4,7 +4,7 @@ const db = require("../db");
 // Posts will serve as a record of completed goals. A new post will be created each time a user completes a day of their goal. The targetDaysMet field will be true if the user has completed all the days of their goal.
 
 const Post = db.define("post", {
-	goalTitle: {
+	title: {
 		type: Sequelize.STRING,
 		allowNull: false
 	},
@@ -15,6 +15,10 @@ const Post = db.define("post", {
 	targetDaysMet: {
 		type: Sequelize.BOOLEAN,
 		allowNull: false
+	},
+	likes: {
+		type: Sequelize.INTEGER,
+		defaultValue: 0
 	}
 });
 
