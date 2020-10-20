@@ -2,6 +2,7 @@ const User = require("./User");
 const Goal = require("./Goal");
 const Post = require("./Post");
 const Friendship = require("./Friendship");
+const Like = require("./Like");
 
 // associations
 
@@ -19,4 +20,10 @@ Goal.belongsTo(User);
 User.hasMany(Post);
 Post.belongsTo(User);
 
-module.exports = { User, Goal, Post, Friendship };
+Post.hasMany(Like);
+Like.belongsTo(Post);
+
+User.hasMany(Like);
+Like.belongsTo(User);
+
+module.exports = { User, Goal, Post, Friendship, Like };

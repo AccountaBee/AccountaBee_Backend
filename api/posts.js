@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { User, Post, Friendship } = require("../db/models");
+const { User, Post, Friendship, Like } = require("../db/models");
 const { Op } = require("sequelize");
 const admin = require("../firebase.config");
 
@@ -32,7 +32,7 @@ router.post("/newPost", async (req, res, next) => {
 });
 
 // get all posts that will be displayed on user's feed
-// takes in an array of friends and token {friends: [], token: "token"} (can dispatch the get friends action right before this)
+// takes in token only
 
 router.post("/feed", async (req, res, next) => {
 	try {
@@ -71,6 +71,12 @@ router.post("/feed", async (req, res, next) => {
 			where: {
 				userUid: {
 					[Op.or]: friendIds
+				}
+			},
+			include: {
+				model: {
+					Like,
+					attributes: ["id"]
 				}
 			}
 		});

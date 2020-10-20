@@ -15,10 +15,6 @@ const Post = db.define("post", {
 	targetDaysMet: {
 		type: Sequelize.BOOLEAN,
 		allowNull: false
-	},
-	likes: {
-		type: Sequelize.INTEGER,
-		defaultValue: 0
 	}
 });
 
