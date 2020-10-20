@@ -11,7 +11,7 @@ const admin = require("../firebase.config");
 
 router.post("/newPost", async (req, res, next) => {
 	try {
-		const { token } = req.body;
+		const { token, title, completedDays, targetDaysMet } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
 		const user = await User.findOne({
@@ -34,7 +34,7 @@ router.post("/newPost", async (req, res, next) => {
 // get all posts that will be displayed on user's feed
 // takes in an array of friends and token {friends: [], token: "token"} (can dispatch the get friends action right before this)
 
-router.post("/posts", async (req, res, next) => {
+router.post("/feed", async (req, res, next) => {
 	try {
 		const { token } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
