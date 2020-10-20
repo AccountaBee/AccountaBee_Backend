@@ -73,13 +73,14 @@ router.post("/feed", async (req, res, next) => {
 					[Op.or]: friendIds
 				}
 			},
-			include: {
-				model: Like
-			},
-			include: {
-				model: User
-				// attributes: ["firstName"]
-			}
+			include: [
+				{
+					model: Like
+				},
+				{
+					model: User
+				}
+			]
 		});
 		res.json(posts);
 	} catch (error) {
