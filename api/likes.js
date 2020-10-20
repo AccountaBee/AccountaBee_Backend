@@ -17,7 +17,6 @@ router.post("/add", (req, res, next) => {
 				uid
 			}
 		});
-
 		const like = await Like.create();
 		await user.addLike(like);
 		const post = await Post.findByPk(postId);
@@ -26,7 +25,6 @@ router.post("/add", (req, res, next) => {
 	} catch (error) {
 		next(error)
 	}
-
 })
 
 // route to show all of a user's unseen likes (this will display on modal on feed)
@@ -50,7 +48,7 @@ router.post("/unseen", async (req, res, next) => {
 				},
 				include: {
 					model: User,
-					attributes: ["firstName"]
+					// attributes: ["firstName"]
 				}
 			}
 		});
