@@ -77,8 +77,8 @@ router.post("/feed", async (req, res, next) => {
 				model: Like
 			},
 			include: {
-				model: User,
-				attributes: ["firstName"]
+				model: User
+				// attributes: ["firstName"]
 			}
 		});
 		res.json(posts);
