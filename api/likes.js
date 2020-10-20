@@ -2,8 +2,34 @@ const router = require("express").Router();
 const { User, Like, Post } = require("../db/models");
 const admin = require("../firebase.config");
 
-// route to show all of a user's unseen likes (this will display on modal on feed)
 
+// route to add a like to a post
+// takes in token and post id
+
+router.post("/add", (req, res, next) => {
+	try {
+		const { token, postId } = req.body;
+		const decodedToken = await admin.auth().verifyIdToken(token);
+		const uid = decodedToken.uid;
+
+		const user = await User.findOne({
+			where: {
+				uid
+			}
+		});
+
+		const like = await Like.create();
+		await user.addLike(like);
+		const post = await Post.findByPk(postId);
+		await post.addLike(like)
+		res.send("Post liked")
+	} catch (error) {
+		next(error)
+	}
+
+})
+
+// route to show all of a user's unseen likes (this will display on modal on feed)
 router.post("/unseen", async (req, res, next) => {
 	try {
 		const { token } = req.body;
@@ -57,5 +83,7 @@ router.put("/update", async (req, res, next) => {
 		next(error);
 	}
 });
+
+
 
 module.exports = router;
