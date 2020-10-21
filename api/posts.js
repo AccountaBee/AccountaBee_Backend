@@ -73,7 +73,6 @@ router.post('/feed', async (req, res, next) => {
 					[Op.or]: friendIds
 				}
 			},
-			attributes: ['completedDays', 'id', 'targetDaysMet', 'title', 'userUid'],
 			include: [
 				{
 					model: Like,
