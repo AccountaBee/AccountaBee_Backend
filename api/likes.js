@@ -72,7 +72,7 @@ router.put('/update', async (req, res, next) => {
 		console.log('decoded token: ', uid);
 
 		for (let i = 0; i < likes.length; i++) {
-			let like = Like.findByPk(likes[i].id);
+			let like = await Like.findByPk(likes[i].id);
 			await like.update({ seen: true });
 		}
 		res.send('Sucessfully closed out notifications');
