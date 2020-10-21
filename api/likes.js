@@ -1,11 +1,11 @@
-const router = require("express").Router();
-const { User, Like, Post } = require("../db/models");
-const admin = require("../firebase.config");
+const router = require('express').Router();
+const { User, Like, Post } = require('../db/models');
+const admin = require('../firebase.config');
 
 // route to add a like to a post
 // takes in token and post id
 
-router.post("/add", async (req, res, next) => {
+router.post('/add', async (req, res, next) => {
 	try {
 		const { token, postId } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
@@ -20,26 +20,26 @@ router.post("/add", async (req, res, next) => {
 		await user.addLike(like);
 		const post = await Post.findByPk(postId);
 		await post.addLike(like);
-		res.send("Post liked");
+		res.send('Post liked');
 	} catch (error) {
 		next(error);
 	}
 });
 
 // route to show all of a user's unseen likes (this will display on modal on feed)
-router.post("/unseen", async (req, res, next) => {
+router.post('/unseen', async (req, res, next) => {
 	try {
 		const { token } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
-		console.log("decoded token: ", uid);
+		console.log('decoded token: ', uid);
 
 		// find all posts where userUid = uid, include unseen likes
 		const posts = await Post.findAll({
 			where: {
 				userUid: uid
 			},
-			attributes: ["id", "title", "completedDays"],
+			attributes: ['id', 'title', 'completedDays'],
 			include: {
 				model: Like,
 				where: {
@@ -64,18 +64,18 @@ router.post("/unseen", async (req, res, next) => {
 // concat likes into one array on client side before passing in
 // takes in { likes: [{}, {}], token }
 
-router.put("/update", async (req, res, next) => {
+router.put('/update', async (req, res, next) => {
 	try {
 		const { token, likes } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
-		console.log("decoded token: ", uid);
+		console.log('decoded token: ', uid);
 
 		for (let i = 0; i < likes.length; i++) {
-			let like = likes[i];
+			let like = Like.findByPk(likes[i].id);
 			await like.update({ seen: true });
 		}
-		res.send("Sucessfully closed out notifications");
+		res.send('Sucessfully closed out notifications');
 	} catch (error) {
 		next(error);
 	}
