@@ -1,7 +1,7 @@
-const router = require("express").Router();
-const { User, Post, Friendship, Like } = require("../db/models");
-const { Op } = require("sequelize");
-const admin = require("../firebase.config");
+const router = require('express').Router();
+const { User, Post, Friendship, Like } = require('../db/models');
+const { Op } = require('sequelize');
+const admin = require('../firebase.config');
 
 // create new post route - are we going to be adding in the actual text on the client side, or here?
 
@@ -9,7 +9,7 @@ const admin = require("../firebase.config");
 
 // are we creating a post for each day checked off? if so we should tell the user to go to the feed in the toast notification
 
-router.post("/newPost", async (req, res, next) => {
+router.post('/newPost', async (req, res, next) => {
 	try {
 		const { token, title, completedDays, targetDaysMet } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
@@ -20,10 +20,10 @@ router.post("/newPost", async (req, res, next) => {
 			}
 		});
 
-		console.log("user in /newPost---->", user);
+		console.log('user in /newPost---->', user);
 
 		const post = await Post.create({ title, completedDays, targetDaysMet });
-		console.log("post in /newPost---->", post);
+		console.log('post in /newPost---->', post);
 		await user.addPost(post);
 		res.json(post);
 	} catch (error) {
@@ -34,21 +34,21 @@ router.post("/newPost", async (req, res, next) => {
 // get all posts that will be displayed on user's feed
 // takes in token only
 
-router.post("/feed", async (req, res, next) => {
+router.post('/feed', async (req, res, next) => {
 	try {
 		const { token } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
-		console.log("uid in /posts --->", uid);
+		console.log('uid in /posts --->', uid);
 
 		// find all confirmed friendships related to the current user, can be either senderId or receiverId
 		const friendships = await Friendship.findAll({
 			where: {
 				[Op.or]: [{ senderId: uid }, { receiverId: uid }],
-				status: "confirmed"
+				status: 'confirmed'
 			}
 		});
-		console.log("friendships in /posts---->", friendships);
+		console.log('friendships in /posts---->', friendships);
 
 		let friendIds = [];
 
@@ -64,7 +64,7 @@ router.post("/feed", async (req, res, next) => {
 
 		// add in user's uid so their posts are included as well in the feed
 		friendIds.push(uid);
-		console.log("friendIds in /posts---->", friendIds);
+		console.log('friendIds in /posts---->', friendIds);
 
 		// find all posts associated with any of the friends - for now this is fine but we need to limit num of posts eventually, maybe some sort of pagination/loading
 		const posts = await Post.findAll({
@@ -73,12 +73,15 @@ router.post("/feed", async (req, res, next) => {
 					[Op.or]: friendIds
 				}
 			},
+			attributes: ['completedDays', 'id', 'targetDaysMet', 'title', 'userUid'],
 			include: [
 				{
-					model: Like
+					model: Like,
+					attributes: ['seen', 'id', 'userUid']
 				},
 				{
-					model: User
+					model: User,
+					attributes: ['firstName']
 				}
 			]
 		});

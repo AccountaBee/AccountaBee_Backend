@@ -45,14 +45,13 @@ router.post('/unseen', async (req, res, next) => {
 				where: {
 					seen: false
 				},
+				attributes: ['id', 'userUid'],
 				include: {
-					model: User
-					// attributes: ["firstName"]
+					model: User,
+					attributes: ['firstName']
 				}
 			}
 		});
-		// should have an array of posts, each with an array of unseen likes
-		// can use post info to craft notification structure ("firstName", "firstName", and 3 others congratulated you for completing "completedDays" days of "title")
 		res.json(posts);
 	} catch (error) {
 		next(error);
