@@ -53,10 +53,10 @@ router.post('/login', async (req, res, next) => {
 });
 
 // route to add a profile picture
-router.patch('/picture', async (req, res, next) => {
+router.put('/picture', async (req, res, next) => {
 	try {
 		const token = req.headers.authorization;
-		console.log('token before!!! ', token);
+		console.log('token before! ', token);
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		console.log('token! ', token);
 		const uid = decodedToken.uid;
