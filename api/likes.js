@@ -11,6 +11,18 @@ router.post('/add', async (req, res, next) => {
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
 
+		const like = await Like.findOne({
+			where: {
+				postId,
+				userUid: uid
+			}
+		});
+
+		// if like already exists, don't do anything
+		if (like) {
+			return res.send('You already liked this post');
+		}
+
 		const user = await User.findOne({
 			where: {
 				uid
