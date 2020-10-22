@@ -24,8 +24,8 @@ router.post('/signup', async (req, res, next) => {
 			where: {
 				uid,
 				firstName,
-				email
-			}
+				email,
+			},
 		});
 
 		res.json(user);
@@ -43,8 +43,8 @@ router.post('/login', async (req, res, next) => {
 
 		const user = await User.findOne({
 			where: {
-				uid
-			}
+				uid,
+			},
 		});
 		res.json(user);
 	} catch (error) {
@@ -55,15 +55,15 @@ router.post('/login', async (req, res, next) => {
 // route to add a profile picture
 router.patch('/picture', async (req, res, next) => {
 	try {
-		const { token } = req.body;
+		const token = req.headers.authorization;
 		const decodedToken = await admin.auth().verifyIdToken(token);
-
+		console.log('token! ', token);
 		const uid = decodedToken.uid;
 
 		const user = await User.findOne({
 			where: {
-				uid
-			}
+				uid,
+			},
 		});
 		// user.profilePicture = req.body.photo
 		// await user.save();
