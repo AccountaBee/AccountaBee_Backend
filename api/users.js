@@ -66,9 +66,12 @@ router.put('/picture', async (req, res, next) => {
 				uid,
 			},
 		});
-		// user.profilePicture = req.body.photo
-		// await user.save();
-		res.json(user);
+		console.log('user is: ', user);
+		console.log('req.header: ', req.headers);
+		console.log('req.body: ', req.body);
+		// user.profilePicture
+		// // await user.save();
+		// res.json(user);
 	} catch (error) {
 		next(error);
 	}
