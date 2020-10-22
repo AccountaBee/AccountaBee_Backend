@@ -8,19 +8,16 @@ const admin = require('../firebase.config');
 router.post('/', async (req, res, next) => {
 	try {
 		const { token } = req.body;
-		console.log('token', token);
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
-		console.log('uid', uid);
 
 		// find all confirmed friendships related to the current user, can be either senderId or receiverId
 		const friendships = await Friendship.findAll({
 			where: {
 				[Op.or]: [{ senderId: uid }, { receiverId: uid }],
-				status: 'confirmed',
-			},
+				status: 'confirmed'
+			}
 		});
-		console.log(friendships);
 
 		const friends = [];
 		// push all users from friendships who are NOT the current user into friends array so that we can send back info about each friend
@@ -28,18 +25,17 @@ router.post('/', async (req, res, next) => {
 			let currentFriendship = friendships[i];
 			let friendId;
 			// set the friendId to whichever id is opposite to the current user's id
-			if (currentFriendship.senderId === uid)
-				friendId = currentFriendship.receiverId;
+			if (currentFriendship.senderId === uid) friendId = currentFriendship.receiverId;
 			else friendId = currentFriendship.senderId;
 			// find friend in the database
 			let friend = await User.findOne({
 				where: {
-					uid: friendId,
-				},
+					uid: friendId
+				}
 			});
 			friends.push(friend);
 		}
-		console.log('friends', friends);
+
 		res.json(friends);
 	} catch (error) {
 		next(error);
@@ -49,18 +45,18 @@ router.post('/', async (req, res, next) => {
 router.post('/number', async (req, res, next) => {
 	try {
 		const { token } = req.body;
-		console.log('token', token);
+
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
-		console.log('uid', uid);
+
 		// find all confirmed friendships related to the current user, can be either senderId or receiverId
 		const friendships = await Friendship.findAll({
 			where: {
 				[Op.or]: [{ senderId: uid }, { receiverId: uid }],
-				status: 'confirmed',
-			},
+				status: 'confirmed'
+			}
 		});
-		console.log(friendships);
+
 		res.json(friendships.length);
 	} catch (error) {
 		next(error);
@@ -71,33 +67,29 @@ router.post('/number', async (req, res, next) => {
 // expecting current user token and friend's email in req.body
 router.post('/request', async (req, res, next) => {
 	try {
-		console.log(req.body);
 		const { token, email } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
-		console.log('uid', uid);
 
 		const friend = await User.findOne({
 			where: {
-				email,
-			},
+				email
+			}
 		});
 
 		const user = await User.findOne({
 			where: {
-				uid,
-			},
+				uid
+			}
 		});
 
 		if (!friend || !user) {
 			return res.status(404).send('Sorry, that user does not have an account');
 		}
-		console.log('user', user);
-		console.log('friend', friend);
 
 		// creates row with user id as senderId and friend's id as receiverId
 		await user.addFriend(friend);
-		console.log('added friend');
+
 		res.send(`Your friend request to ${friend.firstName} is sent!`);
 	} catch (error) {
 		next(error);
@@ -108,25 +100,22 @@ router.post('/request', async (req, res, next) => {
 router.post('/sent', async (req, res, next) => {
 	try {
 		const { token } = req.body;
-		console.log('token', token);
+
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
-		console.log('uid', uid);
 
 		const user = await User.findOne({
 			where: {
-				uid,
-			},
+				uid
+			}
 		});
-		console.log('user', user);
 
 		// can only use magic methods on SENDER
 		const friendships = await user.getFriends();
-		console.log('friendships', friendships);
 
 		// filter so we only have friendships with requested status
 		const unconfirmed = friendships.filter(
-			(friendship) => friendship.friendship.status === 'requested'
+			friendship => friendship.friendship.status === 'requested'
 		);
 		res.json(unconfirmed);
 	} catch (error) {
@@ -138,28 +127,26 @@ router.post('/sent', async (req, res, next) => {
 router.post('/invites', async (req, res, next) => {
 	try {
 		const { token } = req.body;
-		console.log('token', token);
+
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
-		console.log('uid', uid);
 
 		// find all friendships where user is the reciever and status is "requested"
 		const requests = await Friendship.findAll({
 			where: {
 				receiverId: uid,
-				status: 'requested',
-			},
+				status: 'requested'
+			}
 		});
-		console.log('requests', requests);
 
 		// loop through each friendship so we have access to email and firstName of friend to display to user
 		const requestedFriends = [];
 		for (let i = 0; i < requests.length; i++) {
 			let friend = await User.findOne({
 				where: {
-					uid: requests[i].senderId,
+					uid: requests[i].senderId
 				},
-				attributes: ['firstName', 'email', 'uid'],
+				attributes: ['firstName', 'email', 'uid']
 			});
 			requestedFriends.push(friend);
 		}
@@ -172,23 +159,20 @@ router.post('/invites', async (req, res, next) => {
 // PUT /reply - route to confirm or deny friendship. takes in current user token, sender's id, and status (either confirmed or denied) in req.body
 router.put('/reply', async (req, res, next) => {
 	try {
-		console.log(req.body);
 		const { token, senderId, status } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
-		console.log('uid', uid);
 
 		const friendship = await Friendship.findOne({
 			where: {
 				senderId,
-				receiverId: uid,
-			},
+				receiverId: uid
+			}
 		});
-		console.log(friendship);
+
 		await friendship.update({ status });
 		if (status === 'confirmed') return res.send(`You are now friends!`);
-		else if (status === 'denied')
-			return res.send('Successfully deleted friend request');
+		else if (status === 'denied') return res.send('Successfully deleted friend request');
 		else {
 			return res.status(500).send('Sorry, there was an error');
 		}

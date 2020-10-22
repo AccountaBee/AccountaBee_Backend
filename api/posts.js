@@ -20,10 +20,8 @@ router.post('/newPost', async (req, res, next) => {
 			}
 		});
 
-		console.log('user in /newPost---->', user);
-
 		const post = await Post.create({ title, completedDays, targetDaysMet });
-		console.log('post in /newPost---->', post);
+
 		await user.addPost(post);
 		res.json(post);
 	} catch (error) {
@@ -39,7 +37,6 @@ router.post('/feed', async (req, res, next) => {
 		const { token } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
-		console.log('uid in /posts --->', uid);
 
 		// find all confirmed friendships related to the current user, can be either senderId or receiverId
 		const friendships = await Friendship.findAll({
@@ -48,7 +45,6 @@ router.post('/feed', async (req, res, next) => {
 				status: 'confirmed'
 			}
 		});
-		console.log('friendships in /posts---->', friendships);
 
 		let friendIds = [];
 
@@ -64,7 +60,6 @@ router.post('/feed', async (req, res, next) => {
 
 		// add in user's uid so their posts are included as well in the feed
 		friendIds.push(uid);
-		console.log('friendIds in /posts---->', friendIds);
 
 		// find all posts associated with any of the friends - for now this is fine but we need to limit num of posts eventually, maybe some sort of pagination/loading
 		const posts = await Post.findAll({
