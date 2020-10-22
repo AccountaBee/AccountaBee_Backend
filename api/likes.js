@@ -26,6 +26,28 @@ router.post('/add', async (req, res, next) => {
 	}
 });
 
+// expecting token and post id in body
+
+router.post('/remove', async (req, res, next) => {
+	try {
+		const { token, postId } = req.body;
+		const decodedToken = await admin.auth().verifyIdToken(token);
+		const uid = decodedToken.uid;
+
+		const like = await Like.findOne({
+			where: {
+				postId,
+				userUid: uid
+			}
+		});
+
+		await like.destroy();
+		res.send('Successfully unliked post');
+	} catch (error) {
+		next(error);
+	}
+});
+
 // route to show all of a user's unseen likes (this will display on modal on feed)
 router.post('/unseen', async (req, res, next) => {
 	try {
