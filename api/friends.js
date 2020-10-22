@@ -17,8 +17,8 @@ router.post('/', async (req, res, next) => {
 		const friendships = await Friendship.findAll({
 			where: {
 				[Op.or]: [{ senderId: uid }, { receiverId: uid }],
-				status: 'confirmed'
-			}
+				status: 'confirmed',
+			},
 		});
 		console.log(friendships);
 
@@ -28,18 +28,40 @@ router.post('/', async (req, res, next) => {
 			let currentFriendship = friendships[i];
 			let friendId;
 			// set the friendId to whichever id is opposite to the current user's id
-			if (currentFriendship.senderId === uid) friendId = currentFriendship.receiverId;
+			if (currentFriendship.senderId === uid)
+				friendId = currentFriendship.receiverId;
 			else friendId = currentFriendship.senderId;
 			// find friend in the database
 			let friend = await User.findOne({
 				where: {
-					uid: friendId
-				}
+					uid: friendId,
+				},
 			});
 			friends.push(friend);
 		}
 		console.log('friends', friends);
 		res.json(friends);
+	} catch (error) {
+		next(error);
+	}
+});
+
+router.post('/number', async (req, res, next) => {
+	try {
+		const { token } = req.body;
+		console.log('token', token);
+		const decodedToken = await admin.auth().verifyIdToken(token);
+		const uid = decodedToken.uid;
+		console.log('uid', uid);
+		// find all confirmed friendships related to the current user, can be either senderId or receiverId
+		const friendships = await Friendship.findAll({
+			where: {
+				[Op.or]: [{ senderId: uid }, { receiverId: uid }],
+				status: 'confirmed',
+			},
+		});
+		console.log(friendships);
+		res.json(friendships.length);
 	} catch (error) {
 		next(error);
 	}
@@ -57,14 +79,14 @@ router.post('/request', async (req, res, next) => {
 
 		const friend = await User.findOne({
 			where: {
-				email
-			}
+				email,
+			},
 		});
 
 		const user = await User.findOne({
 			where: {
-				uid
-			}
+				uid,
+			},
 		});
 
 		if (!friend || !user) {
@@ -93,8 +115,8 @@ router.post('/sent', async (req, res, next) => {
 
 		const user = await User.findOne({
 			where: {
-				uid
-			}
+				uid,
+			},
 		});
 		console.log('user', user);
 
@@ -104,7 +126,7 @@ router.post('/sent', async (req, res, next) => {
 
 		// filter so we only have friendships with requested status
 		const unconfirmed = friendships.filter(
-			friendship => friendship.friendship.status === 'requested'
+			(friendship) => friendship.friendship.status === 'requested'
 		);
 		res.json(unconfirmed);
 	} catch (error) {
@@ -125,8 +147,8 @@ router.post('/invites', async (req, res, next) => {
 		const requests = await Friendship.findAll({
 			where: {
 				receiverId: uid,
-				status: 'requested'
-			}
+				status: 'requested',
+			},
 		});
 		console.log('requests', requests);
 
@@ -135,9 +157,9 @@ router.post('/invites', async (req, res, next) => {
 		for (let i = 0; i < requests.length; i++) {
 			let friend = await User.findOne({
 				where: {
-					uid: requests[i].senderId
+					uid: requests[i].senderId,
 				},
-				attributes: ['firstName', 'email', 'uid']
+				attributes: ['firstName', 'email', 'uid'],
 			});
 			requestedFriends.push(friend);
 		}
@@ -159,13 +181,14 @@ router.put('/reply', async (req, res, next) => {
 		const friendship = await Friendship.findOne({
 			where: {
 				senderId,
-				receiverId: uid
-			}
+				receiverId: uid,
+			},
 		});
 		console.log(friendship);
 		await friendship.update({ status });
 		if (status === 'confirmed') return res.send(`You are now friends!`);
-		else if (status === 'denied') return res.send('Successfully deleted friend request');
+		else if (status === 'denied')
+			return res.send('Successfully deleted friend request');
 		else {
 			return res.status(500).send('Sorry, there was an error');
 		}
