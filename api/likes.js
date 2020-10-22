@@ -2,14 +2,24 @@ const router = require('express').Router();
 const { User, Like, Post } = require('../db/models');
 const admin = require('../firebase.config');
 
-// route to add a like to a post
-// takes in token and post id
-
+// add a like to a post, takes in token and post id
 router.post('/add', async (req, res, next) => {
 	try {
 		const { token, postId } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
+
+		const like = await Like.findOne({
+			where: {
+				postId,
+				userUid: uid
+			}
+		});
+
+		// makes sure user doesn't like post twice, even though they shouldn't be able to access this route if they've already liked it
+		if (like) {
+			res.send('You already liked this post');
+		}
 
 		const user = await User.findOne({
 			where: {
@@ -26,8 +36,7 @@ router.post('/add', async (req, res, next) => {
 	}
 });
 
-// expecting token and post id in body
-
+// remove like from post. Expecting token and post id in body
 router.post('/remove', async (req, res, next) => {
 	try {
 		const { token, postId } = req.body;
@@ -48,13 +57,12 @@ router.post('/remove', async (req, res, next) => {
 	}
 });
 
-// route to show all of a user's unseen likes (this will display on modal on feed)
+// show all of a user's unseen likes (this will display on modal on feed)
 router.post('/unseen', async (req, res, next) => {
 	try {
 		const { token } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
-		console.log('decoded token: ', uid);
 
 		// find all posts where userUid = uid, include unseen likes
 		const posts = await Post.findAll({
@@ -81,16 +89,12 @@ router.post('/unseen', async (req, res, next) => {
 });
 
 // changes all unseen likes to seen when user closes out the modal
-
-// concat likes into one array on client side before passing in
-// takes in { likes: [{}, {}], token }
-
+// expecting { likes: [{}, {}], token }
 router.put('/update', async (req, res, next) => {
 	try {
 		const { token, likes } = req.body;
 		const decodedToken = await admin.auth().verifyIdToken(token);
 		const uid = decodedToken.uid;
-		console.log('decoded token: ', uid);
 
 		for (let i = 0; i < likes.length; i++) {
 			let like = await Like.findByPk(likes[i].id);
