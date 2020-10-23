@@ -19,7 +19,11 @@ const User = db.define('user', {
 		},
 	},
 	profilePicture: {
-		type: Sequelize.BLOB('long'),
+		type: Sequelize.BLOB('tiny'),
+	},
+	mimeType: {
+		type: Sequelize.STRING,
+		// defaultValue: 'image/jpeg',
 	},
 });
 
