@@ -23,10 +23,9 @@ const User = db.define('user', {
 		get() {
 			const profilePic = this.getDataValue('profilePicture');
 			return profilePic
-				? `data:
-				${this.getDataValue('mimeType')};
-				base64,
-				${this.getDataValue('profilePicture').toString('base64')}`
+				? `data:${this.getDataValue('mimeType')};base64,${this.getDataValue(
+						'profilePicture'
+				  ).toString('base64')}`
 				: null;
 		},
 	},
