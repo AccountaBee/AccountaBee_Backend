@@ -20,10 +20,21 @@ const User = db.define('user', {
 	},
 	profilePicture: {
 		type: Sequelize.BLOB('tiny'),
+		get() {
+			const profilePic = this.getDataValue('profilePicture');
+			return profilePic
+				? URL.createObjectURL(
+						`data:
+				${this.getDataValue('mimeType')};
+				base64,
+				${this.getDataValue('profilePicture').toString('base64')}`
+				  )
+				: null;
+		},
 	},
 	mimeType: {
 		type: Sequelize.STRING,
-		// defaultValue: 'image/jpeg',
+		defaultValue: 'image/png',
 	},
 });
 

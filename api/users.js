@@ -60,19 +60,12 @@ var upload = multer({ storage: storage });
 // route to add a profile picture
 router.post('/picture', upload.single('photo'), async (req, res, next) => {
 	try {
-		console.log('you hit me!');
+		const token = req.headers.authorization;
+		console.log('token before! ', token);
 
-		console.log('req.body: ', req.body);
-		console.log('req.file: ', req.file);
+		const decodedToken = await admin.auth().verifyIdToken(token);
 
-		// const token = req.headers.authorization;
-		// console.log('token before! ', token);
-
-		// const decodednpm inToken = await admin.auth().verifyIdToken(token);
-
-		// const uid = decodedToken.uid;
-
-		// console.log('user is: ', user);
+		const uid = decodedToken.uid;
 		// user.profilePicture = new Blob([req.file.buffer.toString('utf8')], {
 		// 	type: req.file.mimetype,
 		// });
@@ -84,32 +77,18 @@ router.post('/picture', upload.single('photo'), async (req, res, next) => {
 			},
 			{
 				where: {
-					firstName: 'Jenny',
+					uid,
 				},
 				returning: true,
 			}
 		);
-
-		// user.profilePicture = req.file.buffer.toString('utf-8');
-		// console.log('req.file: ', req.file);
-		// user.mimeType = req.file.mimetype;
-		// await user.save();
-		// const jenny = await User.findOne({
-		// 	where: {
-		// 		firstName: 'Jenny',
-		// 	},
-		// });
-		//
-		// let data = {
-		// 	image: Buffer.from(jenny.profilePicture, 'utf-8').toString('base64'),
-		// 	mimeType: jenny.mimeType,
-		// };
-		// console.log('user: ', user);
-		const image = user[0].profilePicture;
+		console.log('user is: ', user);
+		// const image = user[0].profilePicture;
+		res.sendStatus(200);
 		// console.log('image: ', image);
-		res.contentType('image/jpeg');
-		res.setHeader('Content-Length', image.length);
-		res.send(image);
+		// res.contentType('image/jpeg');
+		// res.setHeader('Content-Length', image.length);
+		// res.send(image);
 		// user.profilePicture = new Blob([req.file.buffer.toString('utf8')], {
 		// 	type: req.file.mimetype,
 		// });
