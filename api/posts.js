@@ -3,12 +3,6 @@ const { User, Post, Friendship, Like } = require('../db/models');
 const { Op } = require('sequelize');
 const admin = require('../firebase.config');
 
-// create new post route - are we going to be adding in the actual text on the client side, or here?
-
-// expecting { title, completedDays, targetDaysMet, token} in req.body. targetDaysMet is true or false, check on client side if completedDays === requiredDays before creating post
-
-// are we creating a post for each day checked off? if so we should tell the user to go to the feed in the toast notification
-
 router.post('/newPost', async (req, res, next) => {
 	try {
 		const { token, title, completedDays, targetDaysMet } = req.body;
@@ -20,7 +14,17 @@ router.post('/newPost', async (req, res, next) => {
 			}
 		});
 
-		const post = await Post.create({ title, completedDays, targetDaysMet });
+		let post;
+		if (req.body.frequency) {
+			post = await Post.create({
+				title,
+				completedDays,
+				targetDaysMet,
+				frequency: req.body.frequency
+			});
+		} else {
+			post = await Post.create({ title, completedDays, targetDaysMet });
+		}
 
 		await user.addPost(post);
 		res.json(post);
@@ -74,8 +78,7 @@ router.post('/feed', async (req, res, next) => {
 					attributes: ['seen', 'id', 'userUid', 'createdAt']
 				},
 				{
-					model: User,
-					attributes: ['firstName']
+					model: User
 				}
 			]
 		});
