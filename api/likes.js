@@ -12,8 +12,8 @@ router.post('/add', async (req, res, next) => {
 		const like = await Like.findOne({
 			where: {
 				postId,
-				userUid: uid,
-			},
+				userUid: uid
+			}
 		});
 
 		// makes sure user doesn't like post twice, even though they shouldn't be able to access this route if they've already liked it
@@ -23,14 +23,14 @@ router.post('/add', async (req, res, next) => {
 
 		const user = await User.findOne({
 			where: {
-				uid,
-			},
+				uid
+			}
 		});
 		const newLike = await Like.create();
 		await user.addLike(newLike);
 		const post = await Post.findByPk(postId);
 		await post.addLike(newLike);
-		res.send('Post liked');
+		res.json(newLike);
 	} catch (error) {
 		next(error);
 	}
@@ -46,12 +46,14 @@ router.post('/remove', async (req, res, next) => {
 		const like = await Like.findOne({
 			where: {
 				postId,
-				userUid: uid,
-			},
+				userUid: uid
+			}
 		});
 
+		const deletedLike = { postId, userUid: like.userUid, id: like.id };
+
 		await like.destroy();
-		res.send('Successfully unliked post');
+		res.send(deletedLike);
 	} catch (error) {
 		next(error);
 	}
@@ -67,20 +69,20 @@ router.post('/unseen', async (req, res, next) => {
 		// find all posts where userUid = uid, include unseen likes
 		const posts = await Post.findAll({
 			where: {
-				userUid: uid,
+				userUid: uid
 			},
 			attributes: ['id', 'title', 'completedDays'],
 			include: {
 				model: Like,
 				where: {
-					seen: false,
+					seen: false
 				},
 				attributes: ['id', 'userUid'],
 				include: {
 					model: User,
-					attributes: ['firstName'],
-				},
-			},
+					attributes: ['firstName']
+				}
+			}
 		});
 		res.json(posts);
 	} catch (error) {
