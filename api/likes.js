@@ -18,7 +18,7 @@ router.post('/add', async (req, res, next) => {
 
 		// makes sure user doesn't like post twice, even though they shouldn't be able to access this route if they've already liked it
 		if (like) {
-			res.send('You already liked this post');
+			return res.send(like);
 		}
 
 		const user = await User.findOne({
@@ -30,7 +30,7 @@ router.post('/add', async (req, res, next) => {
 		await user.addLike(newLike);
 		const post = await Post.findByPk(postId);
 		await post.addLike(newLike);
-		const updatedLike = Like.findByPk(newLike.id);
+		const updatedLike = await Like.findByPk(newLike.id);
 		res.json(updatedLike);
 	} catch (error) {
 		next(error);
