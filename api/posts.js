@@ -27,7 +27,9 @@ router.post('/newPost', async (req, res, next) => {
 		}
 
 		await user.addPost(post);
-		const updatedPost = Post.findByPk(post.id, { include: Like });
+		const updatedPost = await Post.findByPk(post.id, {
+			include: [{ model: Like }, { model: User }]
+		});
 		res.json(updatedPost);
 	} catch (error) {
 		next(error);
