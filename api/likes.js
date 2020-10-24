@@ -30,7 +30,8 @@ router.post('/add', async (req, res, next) => {
 		await user.addLike(newLike);
 		const post = await Post.findByPk(postId);
 		await post.addLike(newLike);
-		res.json(newLike);
+		const updatedLike = Like.findByPk(newLike.id);
+		res.json(updatedLike);
 	} catch (error) {
 		next(error);
 	}
