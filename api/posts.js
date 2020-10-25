@@ -36,9 +36,6 @@ router.post('/newPost', async (req, res, next) => {
 	}
 });
 
-// get all posts that will be displayed on user's feed
-// takes in token only
-
 router.post('/feed', async (req, res, next) => {
 	try {
 		const { token } = req.body;
