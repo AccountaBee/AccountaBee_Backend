@@ -14,7 +14,7 @@
 		"type": "git",
 		"url": "git+https://github.com/Capstone-V-A-Y-A/accountaBee-backend.git"
 	},
-	"author": "",
+	"author": "Ashley Valenzuela, Yoon Hee Cho, Valerie Ingmann, Alexandra Langton",
 	"license": "ISC",
 	"bugs": {
 		"url": "https://github.com/Capstone-V-A-Y-A/accountaBee-backend/issues"
@@ -31,7 +31,6 @@
 		"fs": "0.0.1-security",
 		"multer": "^1.4.2",
 		"passport": "^0.4.1",
-		"passport-google-oauth": "^2.0.0",
 		"pg": "^8.4.1",
 		"sequelize": "^6.3.5"
 	},
