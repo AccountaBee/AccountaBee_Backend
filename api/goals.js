@@ -11,11 +11,11 @@ router.post('/allGoals', async (req, res, next) => {
 		const uid = decodedToken.uid;
 		let user = await User.findOne({
 			where: {
-				uid
+				uid,
 			},
 			include: {
-				model: Goal
-			}
+				model: Goal,
+			},
 		});
 
 		if (!user) {
@@ -108,8 +108,8 @@ router.post('/', async (req, res, next) => {
 
 		let user = await User.findOne({
 			where: {
-				uid
-			}
+				uid,
+			},
 		});
 
 		const updatedGoals = [];
@@ -120,8 +120,8 @@ router.post('/', async (req, res, next) => {
 			let [updatedGoal] = await Goal.findOrCreate({
 				where: {
 					userUid: uid,
-					title: currentGoal.title
-				}
+					title: currentGoal.title,
+				},
 			});
 			titles.push(currentGoal.title);
 			await updatedGoal.update({ frequency: currentGoal.frequency });
@@ -129,9 +129,9 @@ router.post('/', async (req, res, next) => {
 			updatedGoals.push(updatedGoal);
 		}
 
-		let newGoals = updatedGoals.filter(goal => titles.includes(goal.title));
+		let newGoals = updatedGoals.filter((goal) => titles.includes(goal.title));
 
-		// // associate goals with user
+		// associate goals with user
 		await user.addGoals(newGoals);
 		res.json(newGoals);
 	} catch (error) {

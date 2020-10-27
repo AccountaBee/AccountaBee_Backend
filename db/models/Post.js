@@ -6,19 +6,19 @@ const db = require('../db');
 const Post = db.define('post', {
 	title: {
 		type: Sequelize.STRING,
-		allowNull: false
+		allowNull: false,
 	},
 	completedDays: {
 		type: Sequelize.INTEGER,
-		allowNull: false
+		allowNull: false,
 	},
 	targetDaysMet: {
 		type: Sequelize.BOOLEAN,
-		allowNull: false
+		allowNull: false,
 	},
 	frequency: {
-		type: Sequelize.INTEGER
-	}
+		type: Sequelize.INTEGER,
+	},
 });
 
 module.exports = Post;

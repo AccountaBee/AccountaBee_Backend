@@ -1,8 +1,7 @@
 const router = require('express').Router();
-const { Goal, User } = require('../db/models');
+const { User } = require('../db/models');
 const admin = require('../firebase.config');
 const multer = require('multer');
-const Blob = require('cross-blob');
 
 router.post('/', async (req, res, next) => {
 	try {
@@ -31,7 +30,9 @@ router.post('/signup', async (req, res, next) => {
 		});
 
 		res.json(user);
-	} catch (error) {}
+	} catch (error) {
+		next(error);
+	}
 });
 
 // expecting token in req.body
@@ -61,16 +62,11 @@ var upload = multer({ storage: storage });
 router.post('/picture', upload.single('photo'), async (req, res, next) => {
 	try {
 		const token = req.headers.authorization;
-		console.log('token before! ', token);
 
 		const decodedToken = await admin.auth().verifyIdToken(token);
 
 		const uid = decodedToken.uid;
-		// user.profilePicture = new Blob([req.file.buffer.toString('utf8')], {
-		// 	type: req.file.mimetype,
-		// });
-		// console.log('req.body: ', req.body);
-		const [numUpdates, user] = await User.update(
+		await User.update(
 			{
 				profilePicture: req.file.buffer,
 				mimeType: req.file.mimetype,
@@ -82,17 +78,7 @@ router.post('/picture', upload.single('photo'), async (req, res, next) => {
 				returning: true,
 			}
 		);
-		console.log('user is: ', user);
-		// const image = user[0].profilePicture;
 		res.sendStatus(200);
-		// console.log('image: ', image);
-		// res.contentType('image/jpeg');
-		// res.setHeader('Content-Length', image.length);
-		// res.send(image);
-		// user.profilePicture = new Blob([req.file.buffer.toString('utf8')], {
-		// 	type: req.file.mimetype,
-		// });
-		// res.json(data);
 	} catch (error) {
 		next(error);
 	}

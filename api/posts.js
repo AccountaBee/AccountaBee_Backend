@@ -10,8 +10,8 @@ router.post('/newPost', async (req, res, next) => {
 		const uid = decodedToken.uid;
 		const user = await User.findOne({
 			where: {
-				uid
-			}
+				uid,
+			},
 		});
 
 		let post;
@@ -20,7 +20,7 @@ router.post('/newPost', async (req, res, next) => {
 				title,
 				completedDays,
 				targetDaysMet,
-				frequency: req.body.frequency
+				frequency: req.body.frequency,
 			});
 		} else {
 			post = await Post.create({ title, completedDays, targetDaysMet });
@@ -28,7 +28,7 @@ router.post('/newPost', async (req, res, next) => {
 
 		await user.addPost(post);
 		const updatedPost = await Post.findByPk(post.id, {
-			include: [{ model: Like }, { model: User }]
+			include: [{ model: Like }, { model: User }],
 		});
 		res.json(updatedPost);
 	} catch (error) {
@@ -46,8 +46,8 @@ router.post('/feed', async (req, res, next) => {
 		const friendships = await Friendship.findAll({
 			where: {
 				[Op.or]: [{ senderId: uid }, { receiverId: uid }],
-				status: 'confirmed'
-			}
+				status: 'confirmed',
+			},
 		});
 
 		let friendIds = [];
@@ -57,7 +57,8 @@ router.post('/feed', async (req, res, next) => {
 			let currentFriendship = friendships[i];
 			let friendId;
 			// set the friendId to whichever id is opposite to the current user's id
-			if (currentFriendship.senderId === uid) friendId = currentFriendship.receiverId;
+			if (currentFriendship.senderId === uid)
+				friendId = currentFriendship.receiverId;
 			else friendId = currentFriendship.senderId;
 			friendIds.push(friendId);
 		}
@@ -69,18 +70,18 @@ router.post('/feed', async (req, res, next) => {
 		const posts = await Post.findAll({
 			where: {
 				userUid: {
-					[Op.or]: friendIds
-				}
+					[Op.or]: friendIds,
+				},
 			},
 			include: [
 				{
 					model: Like,
-					attributes: ['seen', 'id', 'userUid', 'createdAt']
+					attributes: ['seen', 'id', 'userUid', 'createdAt'],
 				},
 				{
-					model: User
-				}
-			]
+					model: User,
+				},
+			],
 		});
 		res.json(posts);
 	} catch (error) {

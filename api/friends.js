@@ -25,9 +25,11 @@ router.post('/', async (req, res, next) => {
 			let currentFriendship = friendships[i];
 			let friendId;
 			// set the friendId to whichever id is opposite to the current user's id
-			if (currentFriendship.senderId === uid)
+			if (currentFriendship.senderId === uid) {
 				friendId = currentFriendship.receiverId;
-			else friendId = currentFriendship.senderId;
+			} else {
+				friendId = currentFriendship.senderId;
+			}
 			// find friend in the database
 			let friend = await User.findOne({
 				where: {
@@ -57,7 +59,6 @@ router.post('/number', async (req, res, next) => {
 				status: 'confirmed',
 			},
 		});
-		console.log('friendships array: ', friendships);
 		res.json(friendships.length);
 	} catch (error) {
 		next(error);
