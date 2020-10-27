@@ -1,5 +1,3 @@
-# accountaBee-backend
-
 ## AccountaBee
 AccountaBee is a mobile app that lets you and your friends set weekly goals, check them off as the week progresses, and keep each other socially accountable. With a feed that updates you on your friends' progress, you can encourage and applaud each others' efforts and achieve your goals together.
 
@@ -18,6 +16,15 @@ https://github.com/AccountaBee/AccountaBee_Frontend "AccountaBee Frontend Reposi
 ```js
 git clone https://github.com/AccountaBee/accountaBee-backend.git
 cd accountaBee-backend
+
+// if you have the psql command line installed:
+createdb capstone
+
+// otherwise:
+psql
+CREATE DATABASE capstone;
+\q
+
 npm install
 npm start
 ```
