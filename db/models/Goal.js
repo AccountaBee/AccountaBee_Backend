@@ -1,22 +1,22 @@
-const Sequelize = require("sequelize");
-const db = require("../db");
+const Sequelize = require('sequelize');
+const db = require('../db');
 
-const Goal = db.define("goal", {
+const Goal = db.define('goal', {
 	title: {
 		type: Sequelize.STRING,
-		allowNull: false
+		allowNull: false,
 	},
 	frequency: {
-		type: Sequelize.INTEGER
+		type: Sequelize.INTEGER,
 	},
 	completedDays: {
 		type: Sequelize.INTEGER,
-		defaultValue: 0
+		defaultValue: 0,
 	},
 	status: {
-		type: Sequelize.ENUM("active", "inactive", "deleted"),
-		defaultValue: "active"
-	}
+		type: Sequelize.ENUM('active', 'inactive', 'deleted'),
+		defaultValue: 'active',
+	},
 });
 
 module.exports = Goal;

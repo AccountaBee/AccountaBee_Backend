@@ -1,11 +1,11 @@
-const Sequelize = require("sequelize");
-const db = require("../db");
+const Sequelize = require('sequelize');
+const db = require('../db');
 
-const Like = db.define("like", {
+const Like = db.define('like', {
 	seen: {
 		type: Sequelize.BOOLEAN,
-		defaultValue: false
-	}
+		defaultValue: false,
+	},
 });
 
 module.exports = Like;

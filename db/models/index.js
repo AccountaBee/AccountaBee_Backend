@@ -1,17 +1,17 @@
-const User = require("./User");
-const Goal = require("./Goal");
-const Post = require("./Post");
-const Friendship = require("./Friendship");
-const Like = require("./Like");
+const User = require('./User');
+const Goal = require('./Goal');
+const Post = require('./Post');
+const Friendship = require('./Friendship');
+const Like = require('./Like');
 
 // associations
 
 // senderId == user who sent the request, receiverId = user who receives request
 User.belongsToMany(User, {
-	as: "friends",
+	as: 'friends',
 	through: Friendship,
-	foreignKey: "senderId",
-	otherKey: "receiverId"
+	foreignKey: 'senderId',
+	otherKey: 'receiverId',
 });
 
 User.hasMany(Goal);
