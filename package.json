@@ -12,14 +12,14 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "git+https://github.com/Capstone-V-A-Y-A/accountaBee-backend.git"
+		"url": "git+https://github.com/AccountaBee/accountaBee-backend.git"
 	},
 	"author": "Ashley Valenzuela, Yoon Hee Cho, Valerie Ingmann, Alexandra Langton",
 	"license": "ISC",
 	"bugs": {
-		"url": "https://github.com/Capstone-V-A-Y-A/accountaBee-backend/issues"
+		"url": "https://github.com/AccountaBee/accountaBee-backend/issues"
 	},
-	"homepage": "https://github.com/Capstone-V-A-Y-A/accountaBee-backend#readme",
+	"homepage": "https://github.com/AccountaBee/accountaBee-backend#readme",
 	"dependencies": {
 		"blob": "^0.1.0",
 		"body-parser": "^1.19.0",
